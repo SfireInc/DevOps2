@@ -137,3 +137,24 @@ services:
     - "5432:5432"
     networks:
     - "resa_net"
+    
+  elasticsearch:
+    container_name: "DevOps2_elasticsearch"
+    image: "docker.elastic.co/elasticsearch/elasticsearch:7.15.2"
+    environment:
+    - "discovery.type=single-node"
+    ports:
+    - "9200:9200"
+    - "9300:9300"
+    networks:
+    - monitoring
+
+  kibana:
+    container_name: "DevOps2_kibana"
+    image: "docker.elastic.co/kibana/kibana:7.15.2"
+    environment:
+    - "ELASTICSEARCH_URL=elasticsearch:9200"
+    ports:
+    - "5601:5601"
+    networks:
+    - monitoring

@@ -1,0 +1,13 @@
+route:
+ # If an alert isn't caught by a route, send it slack.
+ receiver: slack_alerts
+ routes:
+  # Send severity=slack alerts to slack.
+  - match:
+    receiver: slack_alerts
+
+receivers:
+- name: slack_alerts
+  slack_configs:
+  - api_url: "https://hooks.slack.com/services/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"
+    channel: "#alerts"

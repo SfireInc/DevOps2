@@ -3,10 +3,12 @@ version: "3.7"
 volumes:
   my_db_volume:
     driver: "local"
+  resa-db:
 
 networks:
   monitoring:
   app-network:
+  resa_net:
 
 services:
   prometheus:
@@ -14,19 +16,34 @@ services:
     container_name: "DevOps2_prometheus"
     volumes:
     - "./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro"
+    - "./prometheus/rules.yml:/etc/prometheus/rules.yml:ro"
     ports:
     - "9090:9090"
     networks:
     - "monitoring"
     - "app-network"
+    - "resa_net"
     depends_on:
     - "postgres_exporter"
+  
+  alerting:
+    image: "prom/alertmanager:v0.23.0"
+    container_name: "DevOps2_alerting"
+    volumes:
+    - "./prometheus/alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro"
+    ports:
+    - "9093:9093"
+    networks:
+    - "monitoring"
+    depends_on:
+    - "prometheus"
 
   grafana:
     image: "grafana/grafana:8.2.0"
     container_name: "DevOps2_grafana"
     volumes:
     - "./grafana/datasources.yml:/etc/grafana/provisioning/datasources/datasources.yml:ro"
+    - "./grafana/data/:/var/lib/grafana"
     environment:
     - "GF_SECURITY_ADMIN_USER=toudard"
     - "GF_SECURITY_ADMIN_PASSWORD=1234"
@@ -55,7 +72,7 @@ services:
     - "database"
 
   database:
-    container_name: "database"
+    container_name: "DevOps2_database"
     image: "postgres:12.0-alpine"
     networks:
     - "app-network"
@@ -65,7 +82,7 @@ services:
     - "POSTGRES_DB=SchoolOrganisation"
 
   postgres_exporter:
-    container_name: "postgres_exporter"
+    container_name: "DevOps2_postgres_exporter"
     image: "bitnami/postgres-exporter:0.10.0"
     environment:
     - "DATA_SOURCE_NAME=postgresql://takima:takimapass@database:5432/postgres?sslmode=disable"
@@ -75,3 +92,48 @@ services:
     - "app-network"
     depends_on:
     - "database"
+
+  resa-backend:
+    container_name: "DevOps2_resa-backend"
+    build: "./java/reservation-leaks"
+    restart: "always"
+    ports:
+    - "8080:8080"
+    networks:
+    - "resa_net"
+    depends_on:
+    - "resa-liquibase"
+
+  resa-liquibase:
+    container_name: "DevOps2_resa-liquibase"
+    image: "liquibase/liquibase:4.2.0"
+    env_file:
+    - "./java/reservation-leaks/db/db-dataloader/.env"
+    volumes:
+    - "./java/reservation-leaks/db/db-dataloader/resources/changelog:/liquibase/changelog"
+    - "./java/reservation-leaks/db/db-dataloader/resources/migrations:/liquibase/migrations"
+    - "./java/reservation-leaks/db/db-dataloader/liquibase_policy_init.sh:/liquibase/liquibase_policy_init.sh:ro"
+    - "./java/reservation-leaks/db/db-dataloader/wait-for-it.sh:/liquibase/wait-for-it.sh"
+    entrypoint: "./liquibase_policy_init.sh"
+    networks:
+    - "resa_net"
+    depends_on:
+    - "resa-db"
+
+  resa-db:
+    container_name: "DevOps2_resa-db"
+    image: "postgres:14"
+    env_file:
+    - "./java/reservation-leaks/db/resa-db/.env"
+    volumes:
+    - "resa-db:/var/lib/postgresql/data"
+    - "./java/reservation-leaks/db/resa-db/conf/postgres.conf:/etc/postgresql/postgresql.conf:ro"
+    command:
+    - "postgres"
+    - "-c"
+    - "config_file=/etc/postgresql/postgresql.conf"
+    restart: "always"
+    ports:
+    - "5432:5432"
+    networks:
+    - "resa_net"

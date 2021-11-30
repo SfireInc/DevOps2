@@ -2,6 +2,15 @@ global:
   scrape_interval: 2s
   scrape_timeout: 1s
 
+rule_files:
+  - "rules.yml"
+
+alerting:
+  alertmanagers:
+    - static_configs:
+      - targets:
+        - "alerting:9093"
+
 scrape_configs:
   - job_name: "Prometheus"
     metrics_path: "/metrics"
@@ -26,9 +35,17 @@ scrape_configs:
           group: "Backend"
 
   - job_name: "Postgres"
-    metrics_path: /metrics
+    metrics_path: "/metrics"
     static_configs:
       - targets:
         - "postgres_exporter:9187"
         labels:
           group: "Database"
+  
+  - job_name: "resa-backend"
+    metrics_path: "/api/actuator/prometheus"
+    static_configs:
+      - targets:
+        - "resa-backend:8080"
+        labels:
+          group: "Backend"

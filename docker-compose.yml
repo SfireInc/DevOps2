@@ -3,10 +3,12 @@ version: "3.7"
 volumes:
   my_db_volume:
     driver: "local"
+  grafana_data:
 
 networks:
   monitoring:
   app-network:
+  resa-network:
 
 services:
   prometheus:
@@ -27,6 +29,7 @@ services:
     container_name: "DevOps2_grafana"
     volumes:
     - "./grafana/datasources.yml:/etc/grafana/provisioning/datasources/datasources.yml:ro"
+    - "grafana_data:/var/lib/grafana"
     environment:
     - "GF_SECURITY_ADMIN_USER=toudard"
     - "GF_SECURITY_ADMIN_PASSWORD=1234"
@@ -55,7 +58,7 @@ services:
     - "database"
 
   database:
-    container_name: "database"
+    container_name: "DevOps2_database"
     image: "postgres:12.0-alpine"
     networks:
     - "app-network"
@@ -65,7 +68,7 @@ services:
     - "POSTGRES_DB=SchoolOrganisation"
 
   postgres_exporter:
-    container_name: "postgres_exporter"
+    container_name: "DevOps2_postgres_exporter"
     image: "bitnami/postgres-exporter:0.10.0"
     environment:
     - "DATA_SOURCE_NAME=postgresql://takima:takimapass@database:5432/postgres?sslmode=disable"
@@ -75,3 +78,24 @@ services:
     - "app-network"
     depends_on:
     - "database"
+  
+  elasticsearch:
+    container_name: "DevOps2_elasticsearch"
+    image: "docker.elastic.co/elasticsearch/elasticsearch:7.15.2"
+    environment:
+    - "discovery.type=single-node"
+    ports:
+    - "9200:9200"
+    - "9300:9300"
+    networks:
+    - resa-network
+
+  kibana:
+    container_name: "DevOps2_kibana"
+    image: "docker.elastic.co/kibana/kibana:7.15.2"
+    environment:
+    - "ELASTICSEARCH_URL=elasticsearch:9200"
+    ports:
+    - "5601:5601"
+    networks:
+    - resa-network

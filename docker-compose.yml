@@ -56,14 +56,20 @@ services:
   
   frontend:
     container_name: "DevOps2_frontend"
-    build: "./java/sample-application-frontend"
+    image: "sample_frontend"
+    build: 
+      context: "./java/sample-application-frontend/"
+      dockerfile: "Dockerfile"
     ports:
     - "80:80"
     networks:
     - "app-network"
   backend:
     container_name: "DevOps2_backend"
-    build: "./java/reservation-leaks/reservation"
+    image: "sample_backend"
+    build: 
+      context: "./java/sample-application-backend/"
+      dockerfile: "Dockerfile"
     environment:
     - "SPRING_DATASOURCE_URL=jdbc:postgresql://database:5432/SchoolOrganisation"
     networks:
@@ -95,7 +101,10 @@ services:
 
   resa-backend:
     container_name: "DevOps2_resa-backend"
-    build: "./java/reservation-leaks"
+    image: "resa_backend"
+    build: 
+      context: "./java/reservation-leaks/"
+      dockerfile: "Dockerfile"
     restart: "always"
     ports:
     - "8080:8080"

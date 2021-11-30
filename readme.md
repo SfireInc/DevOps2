@@ -29,12 +29,20 @@
 1. What's the difference between the system CPU usage and the process CPU usage ?
 
 The process CPU usage corresponds to the CPU being used by a defined process. (for example the usage of the total CPU Used by the JVM)
-![Graph CPU Usage](.\img\GraphCPUUsage.PNG "Graph CPU Usage")
+
 The System CPU Usage corresponds to the global system CPU Usage (the amount of the hardware CPU being used).
+
+![Graph CPU Usage](https://i.ibb.co/3RtdzMM/Graph-CPULoad.png "Graph CPU Usage")
+
+Here is a graph of the CPU Usage in Grafana, for both System CPU Usage et process (in this case JVM) CPU Usage.
 
 2. What represents the CPU load ?
 
-The CPU load represents the number of processes waiting for the CPU to be available, the higher it is the worse the performance will be because it means that processes will start to take longer, because they will have to wait the end of other processing tasks.
+The CPU load represents the number of processes running on the CPU, if this number becomes Higher than the number of available CPUs, the computing time will start to increase, because processes will have to wait for others to be finished and to make a thread available.
+
+![Graph CPU Load](https://i.ibb.co/3RtdzMM/Graph-CPULoad.png "Graph CPU Load")
+
+On this graph we can see that there was probably some slowdown happening, because the number of needed threads by the system was higher than the available CPUs on the machine.
 
 3. What are all those types of thread ?
 

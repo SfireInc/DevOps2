@@ -1,0 +1,77 @@
+version: "3.7"
+
+volumes:
+  my_db_volume:
+    driver: "local"
+
+networks:
+  monitoring:
+  app-network:
+
+services:
+  prometheus:
+    image: "prom/prometheus:v2.31.1"
+    container_name: "DevOps2_prometheus"
+    volumes:
+    - "./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro"
+    ports:
+    - "9090:9090"
+    networks:
+    - "monitoring"
+    - "app-network"
+    depends_on:
+    - "postgres_exporter"
+
+  grafana:
+    image: "grafana/grafana:8.2.0"
+    container_name: "DevOps2_grafana"
+    volumes:
+    - "./grafana/datasources.yml:/etc/grafana/provisioning/datasources/datasources.yml:ro"
+    environment:
+    - "GF_SECURITY_ADMIN_USER=toudard"
+    - "GF_SECURITY_ADMIN_PASSWORD=1234"
+    ports:
+    - "3000:3000"
+    networks:
+    - "monitoring"
+    depends_on:
+    - "prometheus"
+  
+  frontend:
+    container_name: "DevOps2_frontend"
+    build: "./java/sample-application-frontend"
+    ports:
+    - "80:80"
+    networks:
+    - "app-network"
+  backend:
+    container_name: "DevOps2_backend"
+    build: "./java/reservation-leaks/reservation"
+    environment:
+    - "SPRING_DATASOURCE_URL=jdbc:postgresql://database:5432/SchoolOrganisation"
+    networks:
+    - "app-network"
+    depends_on:
+    - "database"
+
+  database:
+    container_name: "database"
+    image: "postgres:12.0-alpine"
+    networks:
+    - "app-network"
+    environment:
+    - "POSTGRES_PASSWORD=takimapass"
+    - "POSTGRES_USER=takima"
+    - "POSTGRES_DB=SchoolOrganisation"
+
+  postgres_exporter:
+    container_name: "postgres_exporter"
+    image: "bitnami/postgres-exporter:0.10.0"
+    environment:
+    - "DATA_SOURCE_NAME=postgresql://takima:takimapass@database:5432/postgres?sslmode=disable"
+    ports:
+    - "9187:9187"
+    networks:
+    - "app-network"
+    depends_on:
+    - "database"

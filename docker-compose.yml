@@ -56,7 +56,6 @@ services:
   
   frontend:
     container_name: "DevOps2_frontend"
-    image: "sample_frontend"
     build: 
       context: "./java/sample-application-frontend/"
       dockerfile: "Dockerfile"
@@ -66,7 +65,6 @@ services:
     - "app-network"
   backend:
     container_name: "DevOps2_backend"
-    image: "sample_backend"
     build: 
       context: "./java/sample-application-backend/"
       dockerfile: "Dockerfile"
@@ -101,7 +99,6 @@ services:
 
   resa-backend:
     container_name: "DevOps2_resa-backend"
-    image: "resa_backend"
     build: 
       context: "./java/reservation-leaks/"
       dockerfile: "Dockerfile"

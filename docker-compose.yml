@@ -164,3 +164,14 @@ services:
     - "5601:5601"
     networks:
     - monitoring
+
+  jaeger:
+    container_name: "DevOps2_jaeger"
+    image: jaegertracing/opentelemetry-all-in-one
+    ports:
+      - "16686:16686"
+    environment:
+      - JAEGER_AGENT_HOST=jaeger
+    networks:
+      - app-network
+    restart: on-failure

@@ -23,8 +23,6 @@ services:
     - "monitoring"
     - "app-network"
     - "resa_net"
-    depends_on:
-    - "postgres_exporter"
   
   alerting:
     image: "prom/alertmanager:v0.23.0"
@@ -51,8 +49,6 @@ services:
     - "3000:3000"
     networks:
     - "monitoring"
-    depends_on:
-    - "prometheus"
   
   frontend:
     container_name: "DevOps2_frontend"
@@ -90,8 +86,6 @@ services:
     image: "bitnami/postgres-exporter:0.10.0"
     environment:
     - "DATA_SOURCE_NAME=postgresql://takima:takimapass@database:5432/postgres?sslmode=disable"
-    ports:
-    - "9187:9187"
     networks:
     - "app-network"
     depends_on:
@@ -139,8 +133,6 @@ services:
     - "-c"
     - "config_file=/etc/postgresql/postgresql.conf"
     restart: "always"
-    ports:
-    - "5432:5432"
     networks:
     - "resa_net"
     
@@ -151,16 +143,40 @@ services:
     - "discovery.type=single-node"
     ports:
     - "9200:9200"
-    - "9300:9300"
     networks:
-    - monitoring
+    - "monitoring"
+
+  elasticsearch_exporter:
+    container_name: "DevOps2_elasticsearch_exporter"
+    image: "quay.io/prometheuscommunity/elasticsearch-exporter:v1.3.0"
+    command:
+    - "--es.uri=http://elasticsearch:9200"
+    ports:
+    - "9114:9114"
+    networks:
+    - "monitoring"
+    depends_on:
+    - "elasticsearch"
+    
+  filebeat:
+    container_name: "DevOps2_filebeat"
+    image: docker.elastic.co/beats/filebeat:7.15.2
+    user: root
+    volumes:
+    - /var/run/docker.sock:/var/run/docker.sock
+    - ./filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml
+    command: filebeat -e -strict.perms=false
+    networks:
+    - "monitoring"
+    - "app-network"
+    - "resa_net"
 
   kibana:
     container_name: "DevOps2_kibana"
     image: "docker.elastic.co/kibana/kibana:7.15.2"
     environment:
-    - "ELASTICSEARCH_URL=elasticsearch:9200"
+    - "ELASTICSEARCH_HOSTS=http://elasticsearch:9200"
     ports:
     - "5601:5601"
     networks:
-    - monitoring
+    - "monitoring"

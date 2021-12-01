@@ -23,7 +23,7 @@ scrape_configs:
       labels:
         group: "Prometheus"
     
-  - job_name: "Backend"
+  - job_name: "Sample-backend"
     metrics_path: "/api/actuator/prometheus"
     honor_labels: false
     honor_timestamps: true
@@ -42,10 +42,18 @@ scrape_configs:
         labels:
           group: "Database"
   
-  - job_name: "resa-backend"
+  - job_name: "Resa-backend"
     metrics_path: "/api/actuator/prometheus"
     static_configs:
       - targets:
         - "resa-backend:8080"
         labels:
           group: "Backend"
+
+  - job_name: "Elasticsearch"
+    metrics_path: "/metrics"
+    static_configs:
+      - targets:
+        - "elasticsearch_exporter:9114"
+        labels:
+          group: "Elasticsearch"

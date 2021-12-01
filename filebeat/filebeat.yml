@@ -1,0 +1,8 @@
+filebeat.autodiscover:
+  providers:
+    - type: docker
+      templates:
+        - condition.equals:
+            docker.container.image: tp1_backend
+output.elasticsearch:
+  hosts: ["http://elasticsearch:9200"]

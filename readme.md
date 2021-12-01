@@ -1,4 +1,4 @@
-# TP1
+# TP1 - Prometheus et Grafana
 
 ## Architecture of docker-compose
 
@@ -69,8 +69,16 @@
 
 
 
-# TP2
+# TP2 - ELK
 
 1. Which exporter did you use ? Describe your configuration.
 
     We used elasticsearch-Exporter (quay.io/prometheuscommunity/elasticsearch-exporter:v1.3.0)
+
+    
+
+2. List the existing Beats in the Elastic world, and explain in 1-2 lines what data it is supposed to collect.
+
+3. List the steps you followed and the command you run in order to set up Filebeat.
+
+5. Explain how you managed to detect the problem, and how you fixed it or tried to fix it !

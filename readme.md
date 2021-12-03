@@ -66,7 +66,17 @@
     │                                 │
     └─────────────────────────────────┘
 ```
+
+# Links to dashboards:
+
+[Grafana](http://129.151.248.155:3000/) (id: toudard pwd: 1234)
+
+
 # TP1 - Prometheus et Grafana
+
+
+You can access our [Grafana](http://129.151.248.155:3000/) interface hosted on a VPS.
+
 
 1. What's the difference between the system CPU usage and the process CPU usage ?
 
@@ -109,6 +119,69 @@
 
         Source: [JavaDoc](https://docs.oracle.com/javase/9/docs/api/java/lang/management/MemoryUsage.html)
 
+Configuration Prometheus:
+    <img src="https://drive.google.com/uc?id=1GZKcTlWJYHg-s0dyjADlAUZUyyo5Lnj_" alt="Conf Prometheus docker-compose"/>    
+    ```
+    global:
+  scrape_interval: 2s
+  scrape_timeout: 1s
+
+rule_files:
+  - "rules.yml"
+
+alerting:
+  alertmanagers:
+    - static_configs:
+      - targets:
+        - "alerting:9093"
+
+scrape_configs:
+  - job_name: "Prometheus"
+    metrics_path: "/metrics"
+    honor_labels: false
+    honor_timestamps: true
+    sample_limit: 0
+    static_configs:
+    - targets:
+      - "prometheus:9090"
+      labels:
+        group: "Prometheus"
+    
+  - job_name: "Sample-backend"
+    metrics_path: "/api/actuator/prometheus"
+    honor_labels: false
+    honor_timestamps: true
+    sample_limit: 0
+    static_configs:
+      - targets:
+        - "frontend"
+        labels:
+          group: "Backend"
+
+  - job_name: "Postgres"
+    metrics_path: "/metrics"
+    static_configs:
+      - targets:
+        - "postgres_exporter:9187"
+        labels:
+          group: "Database"
+  
+  - job_name: "Resa-backend"
+    metrics_path: "/api/actuator/prometheus"
+    static_configs:
+      - targets:
+        - "resa-backend:8080"
+        labels:
+          group: "Backend"
+
+  - job_name: "Elasticsearch"
+    metrics_path: "/metrics"
+    static_configs:
+      - targets:
+        - "elasticsearch_exporter:9114"
+        labels:
+          group: "Elasticsearch"
+```
 
 
 # TP2 - ELK
@@ -156,4 +229,4 @@ We didn't achieve to build the gatling project due to references problems, so we
 
 7. What is EAGER fetchtype ? What's the difference with LAZY fetchtype ?
 
-    - 
+    - The EAGER fetchtype loads all the ressources at once. It's opposed to the LAZY fetchtype, which only loads ressources when needed.

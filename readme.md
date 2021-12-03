@@ -11,6 +11,8 @@
 [Last Gatling report generated on the VPS (50k Users just for fun)](http://129.151.248.155:8081)</br>
 [Repo GIT](https://github.com/SfireInc/DevOps2)
 
+(If the VPS is down, it might be because of a DDOS considering everything is available publicly on github, please tell us and we'll do what we can to bring it back up)
+
 
 ## TP1 - Prometheus et Grafana
 

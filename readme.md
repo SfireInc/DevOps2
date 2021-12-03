@@ -204,6 +204,15 @@ datasources:
 
 2. List the existing Beats in the Elastic world, and explain in 1-2 lines what data it is supposed to collect.
 
+    - Filebeat : for logs files
+    - Metricbeat : for system-level metrics
+    - Packetbeat : A network packet analyzer
+    - Winlogbeat : collecting windows event logs
+    - Auditbeat : for audit data (identifying securtiy breaches and so on)
+    - Heartbeat : for uptime monitoring
+    - Functionbeat : for monitoring cloud environments
+
+
 3. List the steps you followed and the command you run in order to set up Filebeat.
     We encoutered some trouble with filebeat due too the absence of /var/lib/docker/containers on WSL.
     We decided to test with /var/run/docker.sock but the same probleme occured.

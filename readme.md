@@ -1,6 +1,6 @@
-## Architecture of docker-compose
+# Reports of DevOps 2 Week
 
-# Links to dashboards:
+## Usefull Links:
 
 [Grafana](http://129.151.248.155:3000/) (id: toudard pwd: 1234) </br>
 [Prometheus](http://129.151.248.155:9090/) </br>
@@ -8,11 +8,10 @@
 [Jaeger](http://129.151.248.155:16686/)
 
 
-# TP1 - Prometheus et Grafana
+## TP1 - Prometheus et Grafana
 
 
 You can access our [Grafana](http://129.151.248.155:3000/) interface hosted on a VPS.
-
 
 1. What's the difference between the system CPU usage and the process CPU usage ?
 
@@ -55,19 +54,130 @@ You can access our [Grafana](http://129.151.248.155:3000/) interface hosted on a
 
         Source: [JavaDoc](https://docs.oracle.com/javase/9/docs/api/java/lang/management/MemoryUsage.html)
 
-Configuration Prometheus:
-    <img src="https://drive.google.com/uc?id=1S7h9gi8XuS7ipbp7ioBW4MRi5PN3EJ0d" alt="Conf Prometheus docker-compose"/>
-    <img src="https://drive.google.com/uc?id=1hSDjBu5O83yD87-nr2pI13EQN85Rnovq" alt="Conf Prometheus docker-compose"/>
+### Configuration Prometheus:
 
+> docker-compose.yml
 
-Configuration Grafana (avec utilisation de volumes pour des données persistentes):
-    <img src="https://drive.google.com/uc?id=1TlKR4iLkAE4kMjB_DUJCLK7GrLh6LFTB" alt="Conf Grafana docker-compose"/>
+```yml
+prometheus:
+  image: "prom/prometheus:v2.31.1"
+  container_name: "DevOps2_prometheus"
+  volumes:
+  - "./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro"
+  - "./prometheus/rules.yml:/etc/prometheus/rules.yml:ro"
+  ports:
+  - "9090:9090"
+  networks:
+  - "monitoring"
+  - "app-network"
+  - "resa_net"
+```
 
-# TP2 - ELK
+> prometheus.yml
+
+```yml
+global:
+  scrape_interval: 2s
+  scrape_timeout: 1s
+
+rule_files:
+  - "rules.yml"
+
+alerting:
+  alertmanagers:
+    - static_configs:
+      - targets:
+        - "alerting:9093"
+
+scrape_configs:
+  - job_name: "Prometheus"
+    metrics_path: "/metrics"
+    honor_labels: false
+    honor_timestamps: true
+    sample_limit: 0
+    static_configs:
+    - targets:
+      - "prometheus:9090"
+      labels:
+        group: "Prometheus"
+    
+  - job_name: "Sample-backend"
+    metrics_path: "/api/actuator/prometheus"
+    honor_labels: false
+    honor_timestamps: true
+    sample_limit: 0
+    static_configs:
+      - targets:
+        - "frontend"
+        labels:
+          group: "Backend"
+
+  - job_name: "Postgres"
+    metrics_path: "/metrics"
+    static_configs:
+      - targets:
+        - "postgres_exporter:9187"
+        labels:
+          group: "Database"
+  
+  - job_name: "Resa-backend"
+    metrics_path: "/api/actuator/prometheus"
+    static_configs:
+      - targets:
+        - "resa-backend:8080"
+        labels:
+          group: "Backend"
+
+  - job_name: "Elasticsearch"
+    metrics_path: "/metrics"
+    static_configs:
+      - targets:
+        - "elasticsearch_exporter:9114"
+        labels:
+          group: "Elasticsearch"
+```
+
+### Configuration Grafana
+
+> docker-compose.yml
+
+```yml
+grafana:
+  image: "grafana/grafana:8.2.0"
+  container_name: "DevOps2_grafana"
+  volumes:
+  - "./grafana/datasources.yml:/etc/grafana/provisioning/datasources/datasources.yml:ro"
+  - "./grafana/data/:/var/lib/grafana"
+  environment:
+  - "GF_SECURITY_ADMIN_USER=toudard"
+  - "GF_SECURITY_ADMIN_PASSWORD=1234"
+  ports:
+  - "3000:3000"
+  networks:
+  - "monitoring"
+```
+
+> datasources.yml
+
+```yml
+apiVersion: 1
+datasources:
+- name: Prometheus
+  url: prometheus:9090
+  type: prometheus
+  access: proxy
+  isDefault: true
+  version: 1
+  editable: true
+```
+
+## TP2 - ELK
 
 1. Which exporter did you use ? Describe your configuration.
 
     We used [elasticsearch-Exporter] (quay.io/prometheuscommunity/elasticsearch-exporter:v1.3.0)
+
+    > docker-compose.yml
 
     ```yml
     elasticsearch:
@@ -101,7 +211,7 @@ Configuration Grafana (avec utilisation de volumes pour des données persistente
 5. Explain how you managed to detect the problem, and how you fixed it or tried to fix it !
     Aborted due to previouss fails
 
-# TP3 - Load Tests
+## TP3 - Load Tests
 
 1. What are those parameters used for ?
 

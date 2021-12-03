@@ -139,6 +139,18 @@ services:
     restart: "always"
     networks:
     - "resa_net"
+
+  gatling_tests:
+    image: "registry.e-biz.fr/consulting/kit-demo/reservation/resa_gatling:01"
+    container_name: "DevOps2_gatling_test"
+    build:
+      context: "./gatling/"
+      dockerfile: "Dockerfile"
+    env_file:
+      - "./gatling/.env"
+    network_mode: "host"
+    volumes:
+    - ./gatling/reports:/usr/src/app/target/gatling
     
   elasticsearch:
     container_name: "DevOps2_elasticsearch"

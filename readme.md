@@ -1,5 +1,3 @@
-# TP1 - Prometheus et Grafana
-
 ## Architecture of docker-compose
 
 ```txt
@@ -24,7 +22,51 @@
 │ └──────────┘                    │
 │                                 │
 └─────────────────────────────────┘
+
+
+    ┌────────────────────────────────────────────────────────────────────────────────┐
+    │                                                                                │
+    │ resa_net                                                                       │
+    │                                                                                │
+    │                                                                                │
+    │                                                                                │
+    │                                                                                │
+    │                                                                                │
+    │                                                                                │
+    │                                                                                │
+    │                                                                                │
+    │                                                                                │
+    │                                                                                │
+    │                                                                                │
+    │                                                                                │
+    │                                                                                │
+    │                                                                                │
+    │                           ┌────────────┐                                       │
+    └───────────────────────────┤            ├───────────────────────────────────────┘
+                                │ Prometheus │
+    ┌───────────────────────────┤            ├───────────────────────────────────
+    │app-network                └┬────┬───┬─┬┘ monitoring
+    │ ┌──────────┐ ┌──────────┐  │    │   │ │  ┌──────────┐
+    │ │          │ │          │  │    │   │ │  │          │
+    │ │ DataBase ├─┤ Exporter ├──┘    │   │ └──┤ Grafana  │
+    │ │          │ │          │       │   │    │          │
+    │ └────┬─────┘ └──────────┘       │   │    └──────────┘
+    │      │                          │   │
+    │ ┌────┴─────┐                    │   │    ┌──────────┐
+    │ │          │                    │   │    │          │
+    │ │ BackEnd  │                    │   │    │ Alerting │
+    │ │          │                    │   │    │          │
+    │ └────┬─────┘                    │   │    └──────────┘
+    │      │                          │   │
+    │ ┌────┴─────┐                    │   │
+    │ │          │                    │   │
+    │ │ FrontEnd │                    │   │
+    │ │          │                    │   │
+    │ └──────────┘                    │
+    │                                 │
+    └─────────────────────────────────┘
 ```
+# TP1 - Prometheus et Grafana
 
 1. What's the difference between the system CPU usage and the process CPU usage ?
 
@@ -65,7 +107,7 @@
 
     - commited: represents the amount of memory that is guaranteed to be available for use by the Java virtual machine. The amount of committed memory may change over time (increase or decrease). The Java virtual machine may release memory to the system and committed could be less than init. committed will always be greater than or equal to used.
 
-    (From https://docs.oracle.com/javase/9/docs/api/java/lang/management/MemoryUsage.html)
+        Source: [JavaDoc](https://docs.oracle.com/javase/9/docs/api/java/lang/management/MemoryUsage.html)
 
 
 
@@ -82,3 +124,36 @@
 3. List the steps you followed and the command you run in order to set up Filebeat.
 
 5. Explain how you managed to detect the problem, and how you fixed it or tried to fix it !
+
+# TP3 - Load Tests
+
+We didn't achieve to build the gatling project due to references problems, so we answered to the questions we could but we didn't actually load-test the application.
+
+1. What are those parameters used for ?
+
+    - GATLING_RAMP_USERS/nbUsers Corresponds to the number of users simulated during the load test.
+    - GATLING_RAMP_DURATION/rampDuration Corresponds to the speed at which the simulated users will connect to the service.
+
+3. What can companies do to both absorb those previsible spikes while limiting their costs ?
+
+    - A good solution is to use scalable infrastructure, which will be provisionned with more ressources depending on the load it is under. Every cloud hosting provider provide solutions for this and since they work on the "pay what you use" principle, you only pay extra when the infrastructure is scaled up to absorb more load, thus you can limit the cost by only paying extra when needed.
+
+4. What is the difference between "limits" and "reservations" ?
+
+    - Reservation is the amount dedicated for the container on the machine, it's preallocated to make sure it is always available to use for the container.
+
+    - Limit is the amount of ressources that the container can use.
+
+5. Explain what those two parameters are used for (Xms/Xmx).
+
+    - Those parameters are used to allocate the memory to the heap of the JVM
+    - Xms corresponds to the amount of memory allocated to the heap at the start of the JVM.
+    - Xmx corresponds to the maximum amount of memory the heap is allowed to use.
+
+6. Explain what is a N+1 problem. Why is it happening in our case ?
+
+    - A N+1 problem is happening when a component of the application needed is answering slower than what is expected, for example if you call a database with an API the time lost during the query can be considered a N+1 problem if the query is huge or the database engine can't keep up with the request.
+
+7. What is EAGER fetchtype ? What's the difference with LAZY fetchtype ?
+
+    - 

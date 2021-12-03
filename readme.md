@@ -1,75 +1,11 @@
 ## Architecture of docker-compose
 
-```txt
-┌─────────────────────────────────┐ ┌───────────────────┐
-│app-network                      │ │monitoring         │
-│ ┌──────────┐ ┌──────────┐ ┌─────┴─┴────┐ ┌──────────┐ │
-│ │          │ │          │ │            │ │          │ │
-│ │ DataBase ├─┤ Exporter ├─┤ Prometheus ├─┤ Grafana  │ │
-│ │          │ │          │ │            │ │          │ │
-│ └────┬─────┘ └──────────┘ └─────┬─┬────┘ └──────────┘ │
-│      │                          │ │                   │
-│ ┌────┴─────┐                    │ └───────────────────┘
-│ │          │                    │
-│ │ BackEnd  │                    │  
-│ │          │                    │
-│ └────┬─────┘                    │
-│      │                          │
-│ ┌────┴─────┐                    │
-│ │          │                    │
-│ │ FrontEnd │                    │
-│ │          │                    │
-│ └──────────┘                    │
-│                                 │
-└─────────────────────────────────┘
-
-
-    ┌────────────────────────────────────────────────────────────────────────────────┐
-    │                                                                                │
-    │ resa_net                                                                       │
-    │                                                                                │
-    │                                                                                │
-    │                                                                                │
-    │                                                                                │
-    │                                                                                │
-    │                                                                                │
-    │                                                                                │
-    │                                                                                │
-    │                                                                                │
-    │                                                                                │
-    │                                                                                │
-    │                                                                                │
-    │                                                                                │
-    │                                                                                │
-    │                           ┌────────────┐                                       │
-    └───────────────────────────┤            ├───────────────────────────────────────┘
-                                │ Prometheus │
-    ┌───────────────────────────┤            ├───────────────────────────────────
-    │app-network                └┬────┬───┬─┬┘ monitoring
-    │ ┌──────────┐ ┌──────────┐  │    │   │ │  ┌──────────┐
-    │ │          │ │          │  │    │   │ │  │          │
-    │ │ DataBase ├─┤ Exporter ├──┘    │   │ └──┤ Grafana  │
-    │ │          │ │          │       │   │    │          │
-    │ └────┬─────┘ └──────────┘       │   │    └──────────┘
-    │      │                          │   │
-    │ ┌────┴─────┐                    │   │    ┌──────────┐
-    │ │          │                    │   │    │          │
-    │ │ BackEnd  │                    │   │    │ Alerting │
-    │ │          │                    │   │    │          │
-    │ └────┬─────┘                    │   │    └──────────┘
-    │      │                          │   │
-    │ ┌────┴─────┐                    │   │
-    │ │          │                    │   │
-    │ │ FrontEnd │                    │   │
-    │ │          │                    │   │
-    │ └──────────┘                    │
-    │                                 │
-    └─────────────────────────────────┘
-```
-
 # Links to dashboards:
 
-[Grafana](http://129.151.248.155:3000/) (id: toudard pwd: 1234)
+[Grafana](http://129.151.248.155:3000/) (id: toudard pwd: 1234) </br>
+[Prometheus](http://129.151.248.155:9090/) </br>
+[Elastic/Kibana](http://129.151.248.155:5601/) </br>
+[Jaeger](http://129.151.248.155:16686/)
 
 
 # TP1 - Prometheus et Grafana
@@ -120,87 +56,52 @@ You can access our [Grafana](http://129.151.248.155:3000/) interface hosted on a
         Source: [JavaDoc](https://docs.oracle.com/javase/9/docs/api/java/lang/management/MemoryUsage.html)
 
 Configuration Prometheus:
-    <img src="https://drive.google.com/uc?id=1GZKcTlWJYHg-s0dyjADlAUZUyyo5Lnj_" alt="Conf Prometheus docker-compose"/>    
-    ```
-    global:
-  scrape_interval: 2s
-  scrape_timeout: 1s
+    <img src="https://drive.google.com/uc?id=1S7h9gi8XuS7ipbp7ioBW4MRi5PN3EJ0d" alt="Conf Prometheus docker-compose"/>
+    <img src="https://drive.google.com/uc?id=1hSDjBu5O83yD87-nr2pI13EQN85Rnovq" alt="Conf Prometheus docker-compose"/>
 
-rule_files:
-  - "rules.yml"
 
-alerting:
-  alertmanagers:
-    - static_configs:
-      - targets:
-        - "alerting:9093"
-
-scrape_configs:
-  - job_name: "Prometheus"
-    metrics_path: "/metrics"
-    honor_labels: false
-    honor_timestamps: true
-    sample_limit: 0
-    static_configs:
-    - targets:
-      - "prometheus:9090"
-      labels:
-        group: "Prometheus"
-    
-  - job_name: "Sample-backend"
-    metrics_path: "/api/actuator/prometheus"
-    honor_labels: false
-    honor_timestamps: true
-    sample_limit: 0
-    static_configs:
-      - targets:
-        - "frontend"
-        labels:
-          group: "Backend"
-
-  - job_name: "Postgres"
-    metrics_path: "/metrics"
-    static_configs:
-      - targets:
-        - "postgres_exporter:9187"
-        labels:
-          group: "Database"
-  
-  - job_name: "Resa-backend"
-    metrics_path: "/api/actuator/prometheus"
-    static_configs:
-      - targets:
-        - "resa-backend:8080"
-        labels:
-          group: "Backend"
-
-  - job_name: "Elasticsearch"
-    metrics_path: "/metrics"
-    static_configs:
-      - targets:
-        - "elasticsearch_exporter:9114"
-        labels:
-          group: "Elasticsearch"
-```
-
+Configuration Grafana (avec utilisation de volumes pour des données persistentes):
+    <img src="https://drive.google.com/uc?id=1TlKR4iLkAE4kMjB_DUJCLK7GrLh6LFTB" alt="Conf Grafana docker-compose"/>
 
 # TP2 - ELK
 
 1. Which exporter did you use ? Describe your configuration.
 
-    We used elasticsearch-Exporter (quay.io/prometheuscommunity/elasticsearch-exporter:v1.3.0)
+    We used [elasticsearch-Exporter] (quay.io/prometheuscommunity/elasticsearch-exporter:v1.3.0)
 
-    
+    ```yml
+    elasticsearch:
+      container_name: "DevOps2_elasticsearch"
+      image: "docker.elastic.co/elasticsearch/elasticsearch:7.15.2"
+      environment:
+      - "discovery.type=single-node"
+      networks:
+      - "monitoring"
+
+    elasticsearch_exporter:
+      container_name: "DevOps2_elasticsearch_exporter"
+      image: "quay.io/prometheuscommunity/elasticsearch-exporter:v1.3.0"
+      command:
+      - "--es.uri=http://elasticsearch:9200"
+      networks:
+      - "monitoring"
+      depends_on:
+      - "elasticsearch"
+    ```
+
+    It's a plug and use exporter, we just need to pass the url of elasticsearch and it gets all data that we need
+
 
 2. List the existing Beats in the Elastic world, and explain in 1-2 lines what data it is supposed to collect.
 
 3. List the steps you followed and the command you run in order to set up Filebeat.
+    We encoutered some trouble with filebeat due too the absence of /var/lib/docker/containers on WSL.
+    We decided to test with /var/run/docker.sock but the same probleme occured.
 
 5. Explain how you managed to detect the problem, and how you fixed it or tried to fix it !
+    Aborted due to previouss fails
 
 # TP3 - Load Tests
-
-We didn't achieve to build the gatling project due to references problems, so we answered to the questions we could but we didn't actually load-test the application.
 
 1. What are those parameters used for ?
 
@@ -230,3 +131,12 @@ We didn't achieve to build the gatling project due to references problems, so we
 7. What is EAGER fetchtype ? What's the difference with LAZY fetchtype ?
 
     - The EAGER fetchtype loads all the ressources at once. It's opposed to the LAZY fetchtype, which only loads ressources when needed.
+
+<img src="https://drive.google.com/uc?id=11S0WMh2EDFNNjP9L5QSR2a2eLWG9sBFE" alt="CaptureGraphTestCharge"/>
+We can see on that screen capture the huge spike in ressources during the gatling test
+
+Here is the report generated by gatling after a 1500 users load test
+<img src="https://drive.google.com/uc?id=1yLcsUOMGpmMDC05MVDuB6WI0jltvMfry" alt="CaptureGraphTestCharge"/>
+And here are examples of results after a test in Jaeger
+<img src="https://drive.google.com/uc?id=1QI9FPfHPMkae5OoB622j8vSvKlLhdj33" alt="CaptureGraphTestCharge"/>
+<img src="https://drive.google.com/uc?id=1ZS8WnvhXhPp6dR3GLL92ao2thb04W4lf" alt="CaptureGraphTestCharge"/>

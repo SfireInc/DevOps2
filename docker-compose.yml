@@ -51,7 +51,7 @@ services:
     - "monitoring"
   
   frontend:
-    container_name: "DevOps2_frontend"
+    container_name: "DevOps2_sample_frontend"
     build: 
       context: "./java/sample-application-frontend/"
       dockerfile: "Dockerfile"
@@ -59,8 +59,9 @@ services:
     - "80:80"
     networks:
     - "app-network"
+
   backend:
-    container_name: "DevOps2_backend"
+    container_name: "DevOps2_sample_backend"
     build: 
       context: "./java/sample-application-backend/"
       dockerfile: "Dockerfile"
@@ -72,7 +73,7 @@ services:
     - "database"
 
   database:
-    container_name: "DevOps2_database"
+    container_name: "DevOps2_sample_database"
     image: "postgres:12.0-alpine"
     networks:
     - "app-network"
@@ -135,8 +136,6 @@ services:
     - "postgres"
     - "-c"
     - "config_file=/etc/postgresql/postgresql.conf"
-    ports:
-    - "5432:5432"
     restart: "always"
     networks:
     - "resa_net"
@@ -146,8 +145,6 @@ services:
     image: "docker.elastic.co/elasticsearch/elasticsearch:7.15.2"
     environment:
     - "discovery.type=single-node"
-    ports:
-    - "9200:9200"
     networks:
     - "monitoring"
 
@@ -156,8 +153,6 @@ services:
     image: "quay.io/prometheuscommunity/elasticsearch-exporter:v1.3.0"
     command:
     - "--es.uri=http://elasticsearch:9200"
-    ports:
-    - "9114:9114"
     networks:
     - "monitoring"
     depends_on:

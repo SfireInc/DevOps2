@@ -5,7 +5,8 @@
 [Grafana](http://129.151.248.155:3000/) (id: toudard pwd: 1234) </br>
 [Prometheus](http://129.151.248.155:9090/) </br>
 [Elastic/Kibana](http://129.151.248.155:5601/) </br>
-[Jaeger](http://129.151.248.155:16686/)
+[Jaeger](http://129.151.248.155:16686/) </br>
+[Repo GIT](https://github.com/SfireInc/DevOps2)
 
 
 ## TP1 - Prometheus et Grafana

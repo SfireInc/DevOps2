@@ -96,6 +96,8 @@ services:
     build: 
       context: "./java/reservation-leaks/"
       dockerfile: "Dockerfile"
+    env_file:
+      - ./java/reservation-leaks/.env
     restart: "always"
     ports:
     - "8080:8080"
@@ -113,7 +115,6 @@ services:
     - "./java/reservation-leaks/db/db-dataloader/resources/changelog:/liquibase/changelog"
     - "./java/reservation-leaks/db/db-dataloader/resources/migrations:/liquibase/migrations"
     - "./java/reservation-leaks/db/db-dataloader/liquibase_policy_init.sh:/liquibase/liquibase_policy_init.sh:ro"
-    - "./java/reservation-leaks/db/db-dataloader/wait-for-it.sh:/liquibase/wait-for-it.sh"
     entrypoint: "./liquibase_policy_init.sh"
     networks:
     - "resa_net"
@@ -122,7 +123,9 @@ services:
 
   resa-db:
     container_name: "DevOps2_resa-db"
-    image: "postgres:14"
+    build: 
+      context: "./java/reservation-leaks/db/resa-db"
+      dockerfile: "Dockerfile"
     env_file:
     - "./java/reservation-leaks/db/resa-db/.env"
     volumes:
@@ -132,6 +135,8 @@ services:
     - "postgres"
     - "-c"
     - "config_file=/etc/postgresql/postgresql.conf"
+    ports:
+    - "5432:5432"
     restart: "always"
     networks:
     - "resa_net"

@@ -4,8 +4,6 @@ import io.takima.reservation.trains.dto.requests.TrainCreationRequest;
 import io.takima.reservation.trains.dto.responses.TrainDto;
 import io.takima.reservation.trains.service.TrainService;
 import lombok.AllArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -23,8 +21,6 @@ import org.springframework.web.bind.annotation.*;
 @AllArgsConstructor
 public class TrainApi {
 
-    private final Logger logger = LoggerFactory.getLogger(TrainApi.class);
-
     /**
      * A train service.
      */
@@ -37,10 +33,9 @@ public class TrainApi {
      * @param size The number of trains to put in the page. Defaults to 20.
      * @return A ResponseEntity of a page of Train.
      */
-    @GetMapping
+    @GetMapping("")
     public ResponseEntity<Page<TrainDto>> getAllTrains(@RequestParam(name = "page", required = false, defaultValue = "0") int page,
                                                        @RequestParam(name = "size", required = false, defaultValue = "20") int size) {
-        logger.info(String.format("GET /api/trains - getAllTrains (page: %d, size: %d)", page, size));
 
         var pageRequest = PageRequest.of(page, size, Sort.by("trainId"));
 
@@ -57,8 +52,6 @@ public class TrainApi {
      */
     @GetMapping("/{id}")
     public ResponseEntity<TrainDto> getTrain(@PathVariable(name = "id") Long trainId) {
-        logger.info(String.format("GET /api/trains/{id} - getTrain (id: %d)", trainId));
-
         var train = trainService.getTrain(trainId);
 
         var trainDto = TrainDto.from(train);
@@ -73,10 +66,8 @@ public class TrainApi {
      * @param manualTravelAssign A boolean to toggle the manual assignment of the train to a random travel. Defaults to false.
      * @return The train created.
      */
-    @PostMapping
-    public ResponseEntity<TrainDto> createTrain(@RequestBody TrainCreationRequest train,
-                                                @RequestParam(required = false, defaultValue = "false") boolean manualTravelAssign) {
-        logger.info(String.format("POST /api/trains - createTrain (hash: %d)", train.hashCode()));
+    @PostMapping("")
+    public ResponseEntity<TrainDto> createTrain(@RequestBody TrainCreationRequest train, @RequestParam(required = false, defaultValue = "false") boolean manualTravelAssign) {
 
         var trainDto = TrainDto.from(trainService.create(train, manualTravelAssign));
 

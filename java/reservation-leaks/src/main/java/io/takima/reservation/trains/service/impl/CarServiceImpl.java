@@ -11,8 +11,6 @@ import io.takima.reservation.trains.service.SeatService;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -27,14 +25,11 @@ import java.util.stream.IntStream;
 @AllArgsConstructor
 public class CarServiceImpl implements CarService {
 
-    private final Logger logger = LoggerFactory.getLogger(CarServiceImpl.class);
-
     CarDao carDao;
     SeatService seatService;
 
     @Override
     public Car getCar(Long carId) {
-        logger.info(String.format("getCar (id: %d)", carId));
         return carDao.findById(carId)
                 .orElseThrow(() -> new NoSuchElementException(String.format("No Car with id %d", carId)));
     }
@@ -48,7 +43,6 @@ public class CarServiceImpl implements CarService {
         var seatCount = 0;
 
         if (carClass.equals("A")) {
-            logger.warn("createCar - counting first class seats");
             seatCount = request.getNumberSeatFirstClass();
         } else if (carClass.equals("B")) {
             seatCount = request.getNumberSeatSecondClass();
@@ -76,7 +70,7 @@ public class CarServiceImpl implements CarService {
 
     @Override
     public List<Car> create(TrainCreationRequest request) {
-        logger.info(String.format("create (hash: %d)", request.hashCode()));
+
         return request.getCars()
                 .stream()
                 .map(this::createCar)

@@ -4,8 +4,6 @@ import io.takima.reservation.search.domain.TripType;
 import io.takima.reservation.search.dto.responses.TravelListDto;
 import io.takima.reservation.search.service.SearchTravelService;
 import lombok.AllArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -22,18 +20,17 @@ import java.util.List;
 @RequestMapping(value = "/api/travels", produces = MediaType.APPLICATION_JSON_VALUE)
 public class SearchTravelApi {
 
-    private final Logger logger = LoggerFactory.getLogger(SearchTravelApi.class);
-
     private final SearchTravelService searchService;
 
     @GetMapping("/search")
     public ResponseEntity<List<TravelListDto>> searchAllTravels(@RequestParam(value = "from") String stationFrom, @RequestParam(value = "to") String stationTo,
                                                                 @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
                                                                 @RequestParam(required = false, value = "tripType", defaultValue = "both") String tripTypeStr) {
-        logger.info(String.format("GET /api/travels/search - searchAllTravels (from: %s, to: %s, date: %s)", stationFrom, stationTo, date.toString()));
+
         var tripType = TripType.fromString(tripTypeStr);
 
         var travels = searchService.getAllTravels(stationFrom, stationTo, date, tripType);
+
 
         return ResponseEntity.ok(travels);
     }

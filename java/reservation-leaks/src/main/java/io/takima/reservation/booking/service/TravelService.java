@@ -21,4 +21,5 @@ public interface TravelService {
     TravelDetail getTravelDetail(Long id, String stationFrom, String stationTo);
 
     Travel getRandom();
+
 }

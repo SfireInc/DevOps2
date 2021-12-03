@@ -12,7 +12,7 @@ import io.takima.reservation.trains.domain.Train;
 import io.takima.reservation.trains.dto.responses.CarWithAvailability;
 import io.takima.reservation.trains.dto.responses.SeatWithAvailability;
 import io.takima.reservation.trains.dto.responses.TrainWithAvailability;
-import io.takima.reservation.trains.service.TrainService;
+import io.takima.reservation.trains.repository.TrainDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -33,7 +33,7 @@ public class TravelServiceImpl implements TravelService {
     private TravelDao travelDao;
 
     @Autowired
-    private TrainService trainService;
+    private TrainDao trainDao;
 
     @Override
     public Travel getRandom() {
@@ -71,7 +71,7 @@ public class TravelServiceImpl implements TravelService {
 
         var trainId = request.getTrainId();
         if (trainId != null) {
-            var train = trainService.getTrain(trainId);
+            var train = trainDao.findById(trainId).orElseThrow(() -> new NoSuchElementException(String.format("No Train with id %d", trainId)));
             travel = travel.mergeTrain(train);
         }
 
@@ -93,7 +93,7 @@ public class TravelServiceImpl implements TravelService {
         var travel = getTravel(id);
 
         var stations = travel.getTrip().getStopTimes().stream().filter(st -> st.getStop()
-                .getParentStation().equals(stationFrom) || st.getStop().getParentStation().equals(stationTo))
+                        .getParentStation().equals(stationFrom) || st.getStop().getParentStation().equals(stationTo))
                 .sorted(Comparator.comparingInt(StopTime::getSequence)).map(StopTime::getStop).collect(Collectors.toList());
 
         if (stations.size() != 2) {
@@ -123,4 +123,5 @@ public class TravelServiceImpl implements TravelService {
 
         return TravelDetail.from(travel, trainWithAvailability, travel.getPriceFirstClass() * distance, travel.getPriceSecondClass() * distance);
     }
+
 }

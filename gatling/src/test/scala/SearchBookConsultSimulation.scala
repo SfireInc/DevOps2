@@ -1,5 +1,9 @@
 import io.gatling.core.Predef._
 import io.gatling.http.Predef._
+import io.gatling.http.protocol.HttpProtocolBuilder
+import io.gatling.core.structure.ChainBuilder
+import io.gatling.core.structure.ScenarioBuilder
+
 
 import java.util.UUID.randomUUID
 
@@ -12,10 +16,13 @@ class SearchBookConsultSimulation extends Simulation {
     private val userAgentHeader = "Mozilla/5.0 (Windows NT 5.1; rv:31.0) Gecko/20100101 Firefox/31.0"
     private val SEARCH_URL = "/api/travels/search"
 
-    val httpProtocol = http.baseUrl(baseURL).acceptHeader(acceptHeader).acceptEncodingHeader(acceptEncodingHeader).userAgentHeader(userAgentHeader)
+    val httpProtocol: HttpProtocolBuilder = http
+        .baseUrl(baseURL)
+        .acceptHeader(acceptHeader)
+        .acceptEncodingHeader(acceptEncodingHeader)
+        .userAgentHeader(userAgentHeader)
 
-    def searchTrip(from: String, to: String, fromStation: String, toStation: String, date: String): 
-        ChainBuilder = exec(
+    def searchTrip(from: String, to: String, fromStation: String, toStation: String, date: String): ChainBuilder = exec(
             http(s"Trips from $fromStation to $toStation")
               .get(SEARCH_URL)
               .queryParamSeq(Seq(("from", from), ("to", to), ("date",date))
@@ -23,7 +30,8 @@ class SearchBookConsultSimulation extends Simulation {
     )
 
     object Search { //scala singleton
-        val search = exec(searchTrip("StopArea:OCE87723197", "StopArea:OCE87686006", "Lyon Part-Dieu", "Paris Gare de Lyon", "2021-12-11"))
+        val search: ChainBuilder = 
+        exec(searchTrip("StopArea:OCE87723197", "StopArea:OCE87686006", "Lyon Part-Dieu", "Paris Gare de Lyon", "2021-12-11"))
     }
 
     val searchScenario: ScenarioBuilder = scenario("Search").exec(Search.search)

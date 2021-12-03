@@ -139,6 +139,17 @@ services:
     restart: "always"
     networks:
     - "resa_net"
+  
+  jaeger:
+    container_name: "DevOps2_jaegger"
+    image: jaegertracing/opentelemetry-all-in-one
+    ports:
+    - "16686:16686"
+    environment:
+    - JAEGER_AGENT_HOST=jaeger
+    networks:
+    - resa_net
+    restart: on-failure
 
   gatling_tests:
     image: "registry.e-biz.fr/consulting/kit-demo/reservation/resa_gatling:01"

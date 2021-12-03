@@ -7,7 +7,8 @@
 [Elastic/Kibana](http://129.151.248.155:5601/) </br>
 [Jaeger](http://129.151.248.155:16686/) </br>
 [AlertManager](http://129.151.248.155:9093/)</br>
-[SwaggerUI](http://129.151.248.155:8080/swagger-ui/index.html?configUrl=/v3/api-docs/swagger-config)</br>
+[SampleAppFrontEnd](http://129.151.248.155:80/)</br>
+[Resa-SwaggerUI](http://129.151.248.155:8080/swagger-ui/index.html?configUrl=/v3/api-docs/swagger-config)</br>
 [Last Gatling report generated on the VPS (50k Users just for fun)](http://129.151.248.155:8081)</br>
 [Repo GIT](https://github.com/SfireInc/DevOps2)
 
